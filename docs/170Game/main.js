@@ -1,11 +1,11 @@
 title = "Gravity Swap";
 
 description = `
-    [Hold] Space
+  [Hold] Space
       
        to
-
-  Change Gravity(drop)
+  Change Gravity
+      (drop)
 `;
 
 characters = [

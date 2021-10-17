@@ -177,7 +177,7 @@ function update() {
     swap = true;
     ship.vy = 0.1;
   }
-
+//Stars color
  /** @type {Color} */
   // @ts-ignore
   const s = [

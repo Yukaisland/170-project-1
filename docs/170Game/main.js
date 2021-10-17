@@ -45,16 +45,31 @@ bbbb
    `
 ];
 
+const G = {
+	WIDTH: 100,
+	HEIGHT: 100,
+  STAR_SPEED_MIN: 0.5,
+	STAR_SPEED_MAX: 1.0
+};
 
 
 options = {
+  viewSize: {x: G.WIDTH, y: G.HEIGHT},
   theme:"pixel",
   isPlayingBgm: true,
   isReplayEnabled: false,
   seed: 2000,
 };
 
-
+/**
+* @typedef {{
+  * pos: Vector,
+  * speed: number
+  * }} Star
+  */
+  
+  /*** @type  { Star [] }*/
+  let stars;
 
 /** @type {{x: number, height: number}[]} */
 let walls;
@@ -64,27 +79,39 @@ let ship;
 let swap;
 let scrolling;
 
-/** @type {Vector[]} */
-let coin;
-let nextCoindist;
 
 //************************************* */
 function update() {
   if (!ticks) {
-    walls = times(11, (i) => {
-      return { x: i * 10, height: 5 };
+
+    stars = times(40, () => {
+      
+      const posX = rnd(0, G.WIDTH);
+      const posY = rnd(0, G.HEIGHT);
+      // An object of type Star with appropriate properties
+      return {
+        // Creates a Vector
+          pos: vec(posX, posY),
+          // More RNG
+          speed: rnd(G.STAR_SPEED_MIN, G.STAR_SPEED_MAX)
+          
+      };
+
     });
-    wallHeight = 10;
-    wallHeightVel = 0;
+
+    walls = times(11, (i) => {
+      return { x: i * 10, height: 10 };
+
+      
+    });
+    wallHeight = 70;
+    wallHeightVel = 20;
+
+
     ship = { pos: vec(10, 50), vy: 0 };
     scrolling = 1;
-    
-    //
-    coin = [];
-    nextCoindist = 10
-    
-
   }
+
 
   //********************************* */
   scrolling = difficulty;
@@ -96,7 +123,7 @@ function update() {
   // @ts-ignore
   const wallColor = [
     "purple", "blue", "green", "red","yellow"]
-    [floor(ticks / 50) % 5];
+    [floor(ticks / 20) % 5];
   color(wallColor);
 
 //Generate Walls
@@ -106,23 +133,17 @@ function update() {
       w.x += 110;
       wallHeight += wallHeightVel;
       if (
-        (wallHeight < 10 && wallHeightVel < 0) ||
-        (wallHeight > 50 && wallHeightVel > 0)
+        (wallHeight < 20 && wallHeightVel < 0) ||
+        (wallHeight > 70 && wallHeightVel > 0)
       ) {
         wallHeightVel *= -1;
         wallHeight += wallHeightVel;
-      } else if (rnd() < 0.2) {
-        wallHeightVel = 0;
+      } else if (rnd() < 0.5) {
+        wallHeightVel = 5;
       } else if (rnd() < 0.3) {
         wallHeightVel = rnd() < 0.5 ? -10 : 10;
       }
       w.height = wallHeight;
-
-      //Coin generate
-      nextCoindist--;
-      if (nextCoindist < 0) {
-        coin.push(vec(w.x + 0.1, 90 - w.height - 3));
-      }
      
     }
     rect(w.x, 90 - w.height, 9, w.height);
@@ -146,7 +167,7 @@ function update() {
     play("explosion");
     end();
   }
-
+//ship tail praticle
   color("blue");
   particle(ship.pos.x - 2, ship.pos.y, 0.5, 0.5, PI, PI / 5);
 
@@ -157,28 +178,23 @@ function update() {
     ship.vy = 0.1;
   }
 
-  //Generate coins
-  coin.forEach((c) => {
-    c.x -= scr; 
-      color("yellow");
-      char("c", c);
-      color("red");
-    
-    return c.x > -3;
+ /** @type {Color} */
+  // @ts-ignore
+  const s = [
+    "purple", "blue", "green", "red","yellow"]
+    [floor(ticks / 20) % 5];
+  color(s);
+
+  //Generate stars
+  stars.forEach((s) => {
+    // Move the star forward
+    s.pos.x += s.speed;
+    // Bring the star back to top once it's past the bottom of the screen
+    if (s.pos.x > G.WIDTH) s.pos.x = 0;
+    // Choose a color to draw
+    char( ".", s.pos);
+    // Draw the star as a square of size 1
+    box(s.pos, 1);
   });
-
-
-
- /*    if (coin !== "none") {
-      color("black");
-      const x = coin === "left" ? 30 : 70;
-      if (char(addWithCharCode("p", ship.vy < 0 ? 0 : 1), 
-      ship.pos).isColliding.char.a) {
-        play("coin");
-        coin =  + 1;
-
-        coin = "none";
-      }
-    } */
 
 }

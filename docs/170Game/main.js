@@ -79,6 +79,7 @@ let ship;
 let swap;
 let scrolling;
 
+let time = 0;
 
 //************************************* */
 function update() {
@@ -182,8 +183,9 @@ function update() {
   // @ts-ignore
   const s = [
     "purple", "blue", "green", "red","yellow"]
-    [floor(ticks / 20) % 5];
+    [floor(time / 20) % 5];
   color(s);
+  if(ticks != undefined && ticks >= 0) time = ticks;
 
   //Generate stars
   stars.forEach((s) => {
